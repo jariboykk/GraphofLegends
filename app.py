@@ -198,7 +198,7 @@ def get_player_data(riot_id, tagline, region, api_key):
                         error = f"ランク情報の取得に失敗しました。ステータスコード: {league_response.status_code}, レスポンス: {league_response.text}"
 
                     # Match-V5: リージョナルルート (ここは sea のままでOK)
-                    match_url = f"https://{regional_domain}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=20&api_key={api_key}"
+                    match_url = f"https://{regional_domain}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5&api_key={api_key}"
                     match_response = make_request_with_retry(match_url)
                     if match_response.status_code == 200:
                         match_ids = match_response.json()
