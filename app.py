@@ -1,8 +1,9 @@
 # app.py
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 import requests
 from collections import defaultdict
 import time  # timeモジュールをインポート
+import os  # osモジュールをインポート
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # セッションを使用するために必要
@@ -506,6 +507,9 @@ def index():
         riot_id2=riot_id2
     )
 
+@app.route('/riot.txt')
+def serve_riot_txt():
+    return send_from_directory(os.getcwd(), 'riot.txt')
 
 if __name__ == '__main__':
     app.run(debug=True)
