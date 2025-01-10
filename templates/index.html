@@ -1,0 +1,157 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Graph of Lengends</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Graph of Lengends</h1>
+        <div class="notice">
+            <p>Please note that as this is a trial phase, it may take up to 3 minutes to display the search results.</p>
+        </div>
+        <form method="POST" action="/">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="api_key">API Key:</label>
+                    <!-- ユーザーが入力するAPIキー -->
+                    <input type="password" id="api_key" name="api_key" placeholder="Enter your API key" required value="{{ request.form.api_key }}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="riot_id1">Summoner_name1:</label>
+                    <input type="text" id="riot_id1" name="riot_id1" placeholder="例: summoner_name" required value="{{ request.form.riot_id1 }}">
+                </div>
+                <div class="form-group">
+                    <label for="tagline1">Tag1(not include #):</label>
+                    <input type="text" id="tagline1" name="tagline1" placeholder="例: jp1" required value="{{ request.form.tagline1 }}">
+                </div>
+                <div class="form-group">
+                    <label for="region1">Region1:</label>
+                    <select id="region1" name="region1">
+                        <option value="na1" {% if request.form.region1 == 'na1' %}selected{% endif %}>NA</option>
+                        <option value="br1" {% if request.form.region1 == 'br1' %}selected{% endif %}>BR</option>
+                        <option value="la1" {% if request.form.region1 == 'la1' %}selected{% endif %}>LAN</option>
+                        <option value="la2" {% if request.form.region1 == 'la2' %}selected{% endif %}>LAS</option>
+                        <option value="euw1" {% if request.form.region1 == 'euw1' %}selected{% endif %}>EUW</option>
+                        <option value="eun1" {% if request.form.region1 == 'eun1' %}selected{% endif %}>EUN</option>
+                        <option value="tr1" {% if request.form.region1 == 'tr1' %}selected{% endif %}>TR</option>
+                        <option value="ru" {% if request.form.region1 == 'ru' %}selected{% endif %}>RU</option>
+                        <option value="me1" {% if request.form.region1 == 'me1' %}selected{% endif %}>ME</option>
+                        <option value="jp1" {% if request.form.region1 == 'jp1' %}selected{% endif %}>JP</option>
+                        <option value="kr" {% if request.form.region1 == 'kr' %}selected{% endif %}>KR</option>
+                        <option value="oc1" {% if request.form.region1 == 'oc1' %}selected{% endif %}>OC</option>
+                        <option value="ph2" {% if request.form.region1 == 'ph2' %}selected{% endif %}>PH</option>
+                        <option value="sg2" {% if request.form.region1 == 'sg2' %}selected{% endif %}>SG</option>
+                        <option value="th2" {% if request.form.region1 == 'th2' %}selected{% endif %}>TH</option>
+                        <option value="tw2" {% if request.form.region1 == 'tw2' %}selected{% endif %}>TW</option>
+                        <option value="vn2" {% if request.form.region1 == 'vn2' %}selected{% endif %}>VN</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="riot_id2">Summoner_name2:</label>
+                    <input type="text" id="riot_id2" name="riot_id2" placeholder="例: summoner_name" required value="{{ request.form.riot_id2 }}">
+                </div>
+                <div class="form-group">
+                    <label for="tagline2">Tag2(not include #):</label>
+                    <input type="text" id="tagline2" name="tagline2" placeholder="例: jp1" required value="{{ request.form.tagline2 }}">
+                </div>
+                <div class="form-group">
+                    <label for="region2">Region2:</label>
+                    <select id="region2" name="region2">
+                        <option value="na1" {% if request.form.region2 == 'na1' %}selected{% endif %}>NA</option>
+                        <option value="br1" {% if request.form.region2 == 'br1' %}selected{% endif %}>BR</option>
+                        <option value="la1" {% if request.form.region2 == 'la1' %}selected{% endif %}>LAN</option>
+                        <option value="la2" {% if request.form.region2 == 'la2' %}selected{% endif %}>LAS</option>
+                        <option value="euw1" {% if request.form.region2 == 'euw1' %}selected{% endif %}>EUW</option>
+                        <option value="eun1" {% if request.form.region2 == 'eun1' %}selected{% endif %}>EUN</option>
+                        <option value="tr1" {% if request.form.region2 == 'tr1' %}selected{% endif %}>TR</option>
+                        <option value="ru" {% if request.form.region2 == 'ru' %}selected{% endif %}>RU</option>
+                        <option value="me1" {% if request.form.region2 == 'me1' %}selected{% endif %}>ME</option>
+                        <option value="jp1" {% if request.form.region2 == 'jp1' %}selected{% endif %}>JP</option>
+                        <option value="kr" {% if request.form.region2 == 'kr' %}selected{% endif %}>KR</option>
+                        <option value="oc1" {% if request.form.region2 == 'oc1' %}selected{% endif %}>OC</option>
+                        <option value="ph2" {% if request.form.region2 == 'ph2' %}selected{% endif %}>PH</option>
+                        <option value="sg2" {% if request.form.region2 == 'sg2' %}selected{% endif %}>SG</option>
+                        <option value="th2" {% if request.form.region2 == 'th2' %}selected{% endif %}>TH</option>
+                        <option value="tw2" {% if request.form.region2 == 'tw2' %}selected{% endif %}>TW</option>
+                        <option value="vn2" {% if request.form.region2 == 'vn2' %}selected{% endif %}>VN</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit">Get Graph data</button>
+        </form>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        {% if players %}
+            <div class="player-info">
+                {% for player in players %}
+                    <div class="player">
+                        <div class="profile-area">
+                            <img src="{{ player['profile_icon_url'] }}" alt="プロフィールアイコン" class="profile-icon">
+                            <div class="summoner-info">
+                                {% if loop.index == 1 %}
+                                    <h2>{{ riot_id1 }}</h2>
+                                {% elif loop.index == 2 %}
+                                    <h2>{{ riot_id2 }}</h2>
+                                {% else %}
+                                    <h2>missing summoner_name</h2>
+                                {% endif %}
+                                {% if player['summoner_level'] %}
+                                    <p class="player-level">Level: {{ player['summoner_level'] }}</p>
+                                {% elif player['match_details'] and player['match_details'][0]['level_over_time'] %}
+                                    {% set latest_level = player['match_details'][0]['level_over_time'] | last %}
+                                    <p class="player-level">Level: {{ latest_level.level }}</p>
+                                {% else %}
+                                    <p class="player-level">missing level</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="rank-area">
+                            {% if player['rank_info'] %}
+                                <ul class="rank-info-list">
+                                    {% for rank in player['rank_info'] %}
+                                        <li class="rank-info-item">
+                                            <img 
+                                                src="{{ url_for('static', filename='Ranked_Emblems_Latest/' + rank.tier.lower() + '.png') }}" 
+                                                alt="{{ rank.tier }}" 
+                                                class="rank-icon"
+                                                onerror="this.onerror=null; this.src='{{ url_for('static', filename='Ranked_Emblems_Latest/iron.png') }}';"
+                                            >
+                                            <div class="rank-details">
+                                                <div>{{ rank.tier }} {{ rank.rank }}</div>
+                                                <div>{{ rank.leaguePoints }} LP (勝: {{ rank.wins }}, 敗: {{ rank.losses }})</div>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <div class="rank-info-item">
+                                    <img 
+                                        src="{{ url_for('static', filename='Ranked_Emblems_Latest/iron.png') }}" 
+                                        alt="Unrank" 
+                                        class="rank-icon"
+                                    >
+                                    <p>missing rank</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- 比較やグラフ表示用に差し込んでいるテンプレートがある場合は以下 -->
+            {% include 'comparison_graphs.html' %}
+        {% endif %}
+    </div>
+</body>
+</html>

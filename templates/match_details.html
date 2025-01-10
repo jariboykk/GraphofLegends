@@ -1,0 +1,208 @@
+
+            {% if players %}
+                {% for player in players %}
+                    <div class="result">
+                        <h2>puuid</h2>
+                        <p>{{ player.puuid }}</p>
+                        {% if player.summoner_id %}
+                            <h3>サモナーID</h3>
+                            <p>{{ player.summoner_id }}</p>
+                        {% endif %}
+                        {% if player.summoner_level %}
+                            <h3>サモナーレベル</h3>
+                            <p>{{ player.summoner_level }}</p>
+                        {% endif %}
+                        {% if player.profile_icon_url %}
+                            <h3>プロフィールアイコン</h3>
+                            <img src="{{ player.profile_icon_url }}" alt="プロフィールアイコン" style="width: 50px; height: 50px;">
+                        {% endif %}
+                        {% if player.match_ids %}
+                            <h3>直近20試合のMatch IDと試合情報</h3>
+                            <ul>
+                                {% for match in player.match_details %}
+                                    <li>
+                                        <strong>マッチID:</strong> {{ match.match_id }} <br>
+                                        <strong>サモナー名:</strong> {{ match.summoner_name }} <br>
+                                        <strong>チャンピオン名:</strong> {{ match.champion_name }} <br>
+                                        <img src="{{ match.champion_icon_url }}" alt="{{ match.champion_name }}のアイコン" style="width: 50px; height: 50px;"><br>
+                                        <strong>ゲームタイプ:</strong> {{ match.game_type }} <br>
+                                        <strong>キュータイプ:</strong> {{ match.queue_type }} <br>
+                                        <strong>結果:</strong> {{ match.win }} <br>
+    
+                                        <!-- レベルアップ情報 -->
+                                        <h4>レベルアップ情報 (60秒単位)</h4>
+                                        {% if match.level_over_time %}
+                                            <ul>
+                                                {% for level in match.level_over_time %}
+                                                    <li>{{ level.time }}秒: レベル {{ level.level }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p>レベルアップ情報はありません。</p>
+                                        {% endif %}
+    
+                                        <!-- その他の統計情報 -->
+    
+                                    </li>
+                                {% endfor %}
+                            </ul>
+    
+                            <!-- 平均値表示セクションの追加 -->
+                            <h3>20分以上試合した場合の試合情報の平均値（直近20試合より取得）</h3>
+                            <ul>
+                                {% for time, stats in player.average_stats.items() %}
+                                    <li>
+                                        <strong>{{ time }}秒:</strong><br>
+                                        ゴールド: {{ "%.2f"|format(stats.gold) }} <br>
+                                        XP: {{ "%.2f"|format(stats.xp) }} <br>
+                                        ミニオンキル数: {{ "%.2f"|format(stats.minionsKilled) }} <br>
+                                        ジャングルミニオンキル数: {{ "%.2f"|format(stats.jungleMinionsKilled) }} <br>
+                                        総ダメージ: {{ "%.2f"|format(stats.damage) }} <br>
+                                        チャンピオンキル数: {{ "%.2f"|format(stats.championKills) }} <br>
+                                        チャンピオンデス数: {{ "%.2f"|format(stats.championDeaths) }} <br>
+                                        チャンピオンアシスト数: {{ "%.2f"|format(stats.championAssists) }} <br>
+                                        平均レベル: {{ "%.2f"|format(stats.level) }} <br>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+    
+                            <!-- グラフ表示のためのキャンバス要素 -->
+                            <h3>試合情報の平均値グラフ</h3>
+                            <canvas id="averageStatsChart{{ loop.index }}" width="800" height="400"></canvas>
+    
+                            <script>
+                                // Jinjaからaverage_statsをJSON形式で渡す
+                                const averageStats{{ loop.index }} = {{ player.average_stats|tojson }};
+            
+                                // データの整形
+                                const labels{{ loop.index }} = Object.keys(averageStats{{ loop.index }}).map(time => `${time}秒`);
+                                const goldData{{ loop.index }} = Object.values(averageStats{{ loop.index }}).map(stats => stats.gold);
+                                const xpData{{ loop.index }} = Object.values(averageStats{{ loop.index }}).map(stats => stats.xp);
+                                const minionsKilledData{{ loop.index }} = Object.values(averageStats{{ loop.index }}).map(stats => stats.minionsKilled);
+                                const jungleMinionsKilledData{{ loop.index }} = Object.values(averageStats{{ loop.index }}).map(stats => stats.jungleMinionsKilled);
+                                const damageData{{ loop.index }} = Object.values(averageStats{{ loop.index }}).map(stats => stats.damage);
+                                const championKillsData{{ loop.index }} = Object.values(averageStats{{ loop.index }}).map(stats => stats.championKills);
+                                const championDeathsData{{ loop.index }} = Object.values(averageStats{{ loop.index }}).map(stats => stats.championDeaths);
+                                const championAssistsData{{ loop.index }} = Object.values(averageStats{{ loop.index }}).map(stats => stats.championAssists);
+    
+                                const ctx{{ loop.index }} = document.getElementById('averageStatsChart{{ loop.index }}').getContext('2d');
+                                const averageStatsChart{{ loop.index }} = new Chart(ctx{{ loop.index }}, {
+                                    type: 'line',
+                                    data: {
+                                        labels: labels{{ loop.index }},
+                                        datasets: [
+                                            {
+                                                label: 'ゴールド',
+                                                data: goldData{{ loop.index }},
+                                                borderColor: 'rgba(75, 192, 192, 1)',
+                                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                fill: false,
+                                                tension: 0.1
+                                            },
+                                            {
+                                                label: 'XP',
+                                                data: xpData{{ loop.index }},
+                                                borderColor: 'rgba(153, 102, 255, 1)',
+                                                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                                                fill: false,
+                                                tension: 0.1
+                                            },
+                                            {
+                                                label: 'チニオンキル数',
+                                                data: minionsKilledData{{ loop.index }},
+                                                borderColor: 'rgba(255, 99, 132, 1)',
+                                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                fill: false,
+                                                tension: 0.1
+                                            },
+                                            {
+                                                label: 'ジャングルミニオンキル数',
+                                                data: jungleMinionsKilledData{{ loop.index }},
+                                                borderColor: 'rgba(54, 162, 235, 1)',
+                                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                                fill: false,
+                                                tension: 0.1
+                                            },
+                                            {
+                                                label: '総ダメージ',
+                                                data: damageData{{ loop.index }},
+                                                borderColor: 'rgba(255, 206, 86, 1)',
+                                                backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                                                fill: false,
+                                                tension: 0.1
+                                            },
+                                            {
+                                                label: 'チャンピオンキル数',
+                                                data: championKillsData{{ loop.index }},
+                                                borderColor: 'rgba(75, 192, 192, 1)',
+                                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                fill: false,
+                                                tension: 0.1
+                                            },
+                                            {
+                                                label: 'チャンピオンデス数',
+                                                data: championDeathsData{{ loop.index }},
+                                                borderColor: 'rgba(153, 102, 255, 1)',
+                                                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                                                fill: false,
+                                                tension: 0.1
+                                            },
+                                            {
+                                                label: 'チャンピオンアシスト数',
+                                                data: championAssistsData{{ loop.index }},
+                                                borderColor: 'rgba(255, 159, 64, 1)',
+                                                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                                                fill: false,
+                                                tension: 0.1
+                                            }
+                                        ]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        plugins: {
+                                            title: {
+                                                display: true,
+                                                text: '20分以上の試合における平均値'
+                                            },
+                                            tooltip: {
+                                                mode: 'index',
+                                                intersect: false,
+                                            },
+                                            legend: {
+                                                display: true,
+                                                position: 'top',
+                                            }
+                                        },
+                                        interaction: {
+                                            mode: 'nearest',
+                                            axis: 'x',
+                                            intersect: false
+                                        },
+                                        scales: {
+                                            x: {
+                                                display: true,
+                                                title: {
+                                                    display: true,
+                                                    text: '時間 (秒)'
+                                                }
+                                            },
+                                            y: {
+                                                display: true,
+                                                title: {
+                                                    display: true,
+                                                    text: '値'
+                                                },
+                                                beginAtZero: true
+                                            }
+                                        }
+                                    }
+                                });
+                            </script>
+    
+                        {% else %}
+                            <p>試合IDが取得できませんでした。</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+

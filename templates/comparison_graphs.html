@@ -1,0 +1,609 @@
+{% if players and players|length == 2 %}
+<div class="comparison-section">
+    <h2>Player Comparison Graph</h2>
+
+    <div class="comparison-graphs">
+        <div class="graph-container">
+            <h3>Gold average comparison graph</h3>
+            <canvas id="comparisonGoldChart"></canvas>
+        </div>
+
+        <div class="graph-container">
+            <h3>CS average comparison graph</h3>
+            <canvas id="comparisonMinionsKilledChart"></canvas>
+        </div>
+
+        <div class="graph-container">
+            <h3>Jungle CS average comparison graph</h3>
+            <canvas id="comparisonJungleMinionsKilledChart"></canvas>
+        </div>
+
+        <div class="graph-container">
+            <h3>Total damage average comparison graph</h3>
+            <canvas id="comparisonDamageChart"></canvas>
+        </div>
+
+        <div class="graph-container">
+            <h3>Kills average comparison graph</h3>
+            <canvas id="comparisonChampionKillsChart"></canvas>
+        </div>
+
+        <div class="graph-container">
+            <h3>Deaths average comparison graph</h3>
+            <canvas id="comparisonChampionDeathsChart"></canvas>
+        </div>
+
+        <div class="graph-container">
+            <h3>Assists average comparison graph</h3>
+            <canvas id="comparisonChampionAssistsChart"></canvas>
+        </div>
+
+        <div class="graph-container">
+            <h3>XP average comparison graph</h3>
+            <canvas id="comparisonXPChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // 入力された Riot ID をラベルとして使用
+        const player1Label = "{{ riot_id1 }}";
+        const player2Label = "{{ riot_id2 }}";
+
+        // プレイヤーの平均統計データを取得
+        const player1AverageStats = {{ players[0].average_stats|tojson }};
+        const player2AverageStats = {{ players[1].average_stats|tojson }};
+
+        const timeLabels = Object.keys(player1AverageStats).map(time => `${time}秒`);
+        const player1GoldData = Object.values(player1AverageStats).map(stats => stats.gold);
+        const player2GoldData = Object.values(player2AverageStats).map(stats => stats.gold);
+
+        const ctxComparisonGold = document.getElementById('comparisonGoldChart').getContext('2d');
+        const comparisonGoldChart = new Chart(ctxComparisonGold, {
+            type: 'line',
+            data: {
+                labels: timeLabels,
+                datasets: [
+                    {
+                        label: player1Label, // 入力された Riot ID 1 をラベルとして使用
+                        data: player1GoldData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: player2Label, // 入力された Riot ID 2 をラベルとして使用
+                        data: player2GoldData,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Gold average comparison'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Time (sec)'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Gold'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // ミニオンキル数比較グラフのスクリプト
+        const player1MinionsKilledData = Object.values(player1AverageStats).map(stats => stats.minionsKilled);
+        const player2MinionsKilledData = Object.values(player2AverageStats).map(stats => stats.minionsKilled);
+
+        const ctxComparisonMinions = document.getElementById('comparisonMinionsKilledChart').getContext('2d');
+        const comparisonMinionsKilledChart = new Chart(ctxComparisonMinions, {
+            type: 'line',
+            data: {
+                labels: timeLabels,
+                datasets: [
+                    {
+                        label: player1Label, // 入力された Riot ID 1 をラベルとして使用
+                        data: player1MinionsKilledData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: player2Label, // 入力された Riot ID 2 をラベルとして使用
+                        data: player2MinionsKilledData,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'CS average comparison'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Time (sec)'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'CS'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // ジャングルミニオンキル数比較グラフのスクリプトを追加
+        const player1JungleMinionsKilledData = Object.values(player1AverageStats).map(stats => stats.jungleMinionsKilled);
+        const player2JungleMinionsKilledData = Object.values(player2AverageStats).map(stats => stats.jungleMinionsKilled);
+
+        const ctxComparisonJungleMinions = document.getElementById('comparisonJungleMinionsKilledChart').getContext('2d');
+        const comparisonJungleMinionsKilledChart = new Chart(ctxComparisonJungleMinions, {
+            type: 'line',
+            data: {
+                labels: timeLabels,
+                datasets: [
+                    {
+                        label: player1Label, // 入力された Riot ID 1 をラベルとして使用
+                        data: player1JungleMinionsKilledData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: player2Label, // 入力された Riot ID 2 をラベルとして使用
+                        data: player2JungleMinionsKilledData,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Jungle CS average comparison'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Time (sec)'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Jungle CS'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // 総ダメージ比較グラフのスクリプトを追加
+        const player1DamageData = Object.values(player1AverageStats).map(stats => stats.damage);
+        const player2DamageData = Object.values(player2AverageStats).map(stats => stats.damage);
+
+        const ctxComparisonDamage = document.getElementById('comparisonDamageChart').getContext('2d');
+        const comparisonDamageChart = new Chart(ctxComparisonDamage, {
+            type: 'line',
+            data: {
+                labels: timeLabels,
+                datasets: [
+                    {
+                        label: player1Label, // 入力された Riot ID 1 をラベルとして使用
+                        data: player1DamageData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: player2Label, // 入力された Riot ID 2 をラベルとして使用
+                        data: player2DamageData,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Total damage average comparison'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Time (sec)'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Total damage'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // チャンピオンキル数の平均値比較グラフのデータ取得
+        const player1ChampionKillsData = Object.values(player1AverageStats).map(stats => stats.championKills);
+        const player2ChampionKillsData = Object.values(player2AverageStats).map(stats => stats.championKills);
+
+        const ctxComparisonChampionKills = document.getElementById('comparisonChampionKillsChart').getContext('2d');
+        const comparisonChampionKillsChart = new Chart(ctxComparisonChampionKills, {
+            type: 'line',
+            data: {
+                labels: timeLabels,
+                datasets: [
+                    {
+                        label: player1Label, // 入力された Riot ID 1 をラベルとして使用
+                        data: player1ChampionKillsData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: player2Label, // 入力された Riot ID 2 をラベルとして使用
+                        data: player2ChampionKillsData,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Kills average comparison'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Time (sec)'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Kills'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // チャンピオンデス数の平均値比較グラフのデータ取得
+        const player1ChampionDeathsData = Object.values(player1AverageStats).map(stats => stats.championDeaths);
+        const player2ChampionDeathsData = Object.values(player2AverageStats).map(stats => stats.championDeaths);
+
+        const ctxComparisonChampionDeaths = document.getElementById('comparisonChampionDeathsChart').getContext('2d');
+        const comparisonChampionDeathsChart = new Chart(ctxComparisonChampionDeaths, {
+            type: 'line',
+            data: {
+                labels: timeLabels,
+                datasets: [
+                    {
+                        label: player1Label, // 入力された Riot ID 1 をラベルとして使用
+                        data: player1ChampionDeathsData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: player2Label, // 入力された Riot ID 2 をラベルとして使用
+                        data: player2ChampionDeathsData,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Deaths average comparison'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Time (sec)'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Deaths'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // チャンピオンアシスト数の平均値比較グラフのデータ取得
+        const player1ChampionAssistsData = Object.values(player1AverageStats).map(stats => stats.championAssists);
+        const player2ChampionAssistsData = Object.values(player2AverageStats).map(stats => stats.championAssists);
+
+        const ctxComparisonChampionAssists = document.getElementById('comparisonChampionAssistsChart').getContext('2d');
+        const comparisonChampionAssistsChart = new Chart(ctxComparisonChampionAssists, {
+            type: 'line',
+            data: {
+                labels: timeLabels,
+                datasets: [
+                    {
+                        label: player1Label, // 入力された Riot ID 1 をラベルとして使用
+                        data: player1ChampionAssistsData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: player2Label, // 入力された Riot ID 2 をラベルとして使用
+                        data: player2ChampionAssistsData,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Assists average comparison'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Time (sec)'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Assists'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // XPの平均統計データを取得
+        const player1XPData = Object.values(player1AverageStats).map(stats => stats.xp);
+        const player2XPData = Object.values(player2AverageStats).map(stats => stats.xp);
+
+        const ctxComparisonXP = document.getElementById('comparisonXPChart').getContext('2d');
+        const comparisonXPChart = new Chart(ctxComparisonXP, {
+            type: 'line',
+            data: {
+                labels: timeLabels,
+                datasets: [
+                    {
+                        label: player1Label, // 入力された Riot ID 1 をラベルとして使用
+                        data: player1XPData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: player2Label, // 入力された Riot ID 2 をラベルとして使用
+                        data: player2XPData,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: false,
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'XP average comparison'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                                text: 'Time (sec)'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'XP'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</div>
+{% endif %}
